@@ -9,7 +9,7 @@ The project is built in steps as follows:
 2) Create a player hand that is easy to work with - v
 3) Sort that hand into the appropriate manner - v
 4) Calculate the best combinations that are possible by that hand - v
-5) Calculate the chance, that the next card is 'good'
+5) Calculate the chance, that the next card is 'good' - v
 6) Implement swapping mechanics
 7) Implement end-game conditions
  * v - Completed

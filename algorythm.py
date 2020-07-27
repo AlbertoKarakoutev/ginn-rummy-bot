@@ -6,6 +6,7 @@ card_suites = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
 cards = []
 hand = []
 in_combination = []
+not_in_combination = [0]
 cards_passed = 0
 chance = 0
 
@@ -23,7 +24,7 @@ while i < 10:
         i += 1
 
 # Concrete hand distributing (Debug)
-# hand =[['Spades', 1], ['Spades', 2], ['Spades', 3], ['Spades', 4], ['Clubs', 6], ['Spades', 11], ['Hearts', 3], ['Diamonds', 8], ['Diamonds', 7], ['Diamonds', 12]]
+hand =[['Spades', 6], ['Spades', 1], ['Hearts', 13], ['Hearts', 12], ['Hearts', 4], ['Diamonds', 7], ['Diamonds', 4], ['Diamonds', 2], ['Clubs', 6], ['Clubs', 1]]
 
 # Sorting hand based on suites and card size
 for card_c in cards:
@@ -56,7 +57,6 @@ def combination_morph(combination, virt_hand):
 # Sort the cards into card combinations - Sequential or Identical
 def configure(player_hand):
     virtual_hand = deepcopy(player_hand)
-    not_in_combination = [0]
     current_card = []
     while 1:
         added = False
@@ -104,12 +104,43 @@ def chance():
     chance = 0
     for c in in_combination:
         c1 = deepcopy(c)
-        c1.remove(c1[0])
-        max_card = max(c1, key=lambda x: x[1])
-        min_card = min(c1, key=lambda x: x[1])
+        if c1[0] == 1:
+            c1.remove(c1[0])
+            card_in_hand = False
+            max_card = max(c1, key=lambda x: x[1])
+            min_card = min(c1, key=lambda x: x[1])
+            if max_card[1] < 13:
+                for comb in in_combination:
+                    if [c1[0][0], max_card[1] + 1] in comb:
+                        card_in_hand = True
+                if not card_in_hand:
+                    chance += 1/52
+            card_in_hand = False
+            if min_card[1] > 1:
+                for comb in in_combination:
+                    if [c1[0][0], min_card[1] - 1] in comb:
+                        card_in_hand = True
+                if not card_in_hand:
+                    chance += 1 / 52
+        if c1[0] == 2:
+            c1.remove(c1[0])
+            card_in_hand = False
+            suites_cpy = deepcopy(card_suites)
+            for card in c1:
+                suites_cpy.remove(card[0])
+            for comb in in_combination:
+                if comb[0] == 1:
+                    for a in range(1, len(comb)):
+                        card = comb[a]
+                        if card[0] in suites_cpy:
+                            if card[1] == c1[0][1]:
+                                card_in_hand = True
+            if not card_in_hand:
+                chance += (1/52) * len(suites_cpy)
+    return chance * 100
 
 
 # print("hand:")
 print(hand)
 configure(hand)
-chance()
+print(chance())
