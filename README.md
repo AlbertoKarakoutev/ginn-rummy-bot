@@ -10,6 +10,8 @@ The project is built in steps as follows:
 3) Sort that hand into the appropriate manner - v
 4) Calculate the best combinations that are possible by that hand - v
 5) Calculate the chance, that the next card is 'good' - v
-6) Implement swapping mechanics
-7) Implement end-game conditions
+6) Calculate best possible swapping card and new hand configuration - '
+7) Implement swapping mechanics
+8) Implement end-game conditions
  * v - Completed
+ * ' - In progress
