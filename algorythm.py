@@ -25,7 +25,7 @@ while i < 10:
         i += 1
 
 # Concrete hand distributing (Debug)
-# hand =[['Spades', 6], ['Spades', 1], ['Hearts', 13], ['Hearts', 12], ['Hearts', 4], ['Diamonds', 7], ['Diamonds', 4], ['Diamonds', 2], ['Clubs', 6], ['Clubs', 1]]
+hand =[['Hearts', 11], ['Clubs', 13], ['Clubs', 1], ['Diamonds', 10], ['Hearts', 10], ['Spades', 10], ['Hearts', 1], ['Clubs', 2], ['Clubs', 5], ['Diamonds', 6]]
 
 # Sorting hand based on suites and card size
 for card_c in cards_cpy:
@@ -105,36 +105,60 @@ def configure(hand_given, set_new_variables):
     in_combination_local = []
     not_in_combination_local = [0]
     while 1:
-        added = False
+
         if len(virtual_hand) > 0:
             current_card = virtual_hand[0]
         else:
             break
+        added = False
         virtual_hand.remove(current_card)
         # Combination[0] codes:
         # 1 - Sequential combination
         # 2 - Identical combination
         # 0 - Not in combination
 
+        seq_hand = deepcopy(virtual_hand)
+        ident_hand = deepcopy(virtual_hand)
+        new_combination_seq = [1]
+        new_combination_ident = [2]
+        length_seq = 0
+        length_ident = 0
+        seq_card = []
+        ident_card = []
+
         # Creating new seq. combination (if possible)
-        for comparing_card in virtual_hand:
+        for comparing_card in seq_hand:
+            seq_card = comparing_card
             if current_card[0] == comparing_card[0]:
                 if abs(current_card[1] - comparing_card[1]) <= 1:
-                    virtual_hand.remove(comparing_card)
-                    new_combination = [1, current_card, comparing_card]
-                    combination_morph(new_combination, virtual_hand)
-                    in_combination_local.append(new_combination)
+                    seq_hand.remove(comparing_card)
+                    new_combination_seq.append(current_card)
+                    new_combination_seq.append(comparing_card)
+                    combination_morph(new_combination_seq, seq_hand)
+                    length_seq = len(new_combination_seq)
                     added = True
                     break
-        if not added:
 
-            # Creating new identical combination (if possible)
-            for comparing_card in virtual_hand:
-                if current_card[1] == comparing_card[1]:
-                    virtual_hand.remove(comparing_card)
-                    in_combination_local.append([2, comparing_card, current_card])
-                    added = True
-                    break
+        # Creating new identical combination (if possible)
+        for comparing_card in ident_hand:
+            ident_card = comparing_card
+            if current_card[1] == comparing_card[1]:
+                ident_hand.remove(comparing_card)
+                new_combination_ident.append(current_card)
+                new_combination_ident.append(comparing_card)
+                combination_morph(new_combination_ident, ident_hand)
+                length_ident = len(new_combination_ident)
+                added = True
+                break
+
+        if added:
+            if length_seq >= length_ident:
+                in_combination_local.append(new_combination_seq)
+                virtual_hand_cpy = seq_hand
+            else:
+                in_combination_local.append(new_combination_ident)
+                virtual_hand_cpy = ident_hand
+
         if not added:
             not_in_combination_local.append(current_card)
 
@@ -147,13 +171,20 @@ def configure(hand_given, set_new_variables):
     return new_hand
 
 
+#problem when running this random hand with this random card
+#need to implement method to check best combinations for both card in a newly created, so to see if comparing card has a better option
+# random_card = random.choice(deck)
+random_card = ['Hearts', 1]
+print(random_card)
+print(hand)
 configure(hand, True)
 print(in_combination)
 
-random_card = random.choice(deck)
+
 current_best = []
 max_chance = 0
-for card in hand:
+for b in range(1, len(not_in_combination)):
+    card = not_in_combination[b]
     hand_cpy = deepcopy(hand)
     hand_cpy.insert(hand_cpy.index(card), random_card)
     hand_cpy.remove(card)
