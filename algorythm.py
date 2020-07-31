@@ -17,17 +17,17 @@ for i in card_suites:
 
 # Random hand distributing
 i = 0
-while i < 10:
+"""while i < 10:
     candidate = random.choice(deck)
     if candidate not in hand:
         hand.append(candidate)
         deck.remove(candidate)
-        i += 1
+        i += 1"""
 
 # Concrete hand distributing (Debug)
-"""hand = [['Diamonds', 3], ['Diamonds', 6], ['Hearts', 2], ['Diamonds', 11], ['Hearts', 7], ['Hearts', 8], ['Diamonds', 13], ['Diamonds', 7], ['Hearts', 6], ['Hearts', 1]]
+hand = [['Clubs', 4], ['Hearts', 3], ['Spades', 9], ['Hearts', 5], ['Hearts', 2], ['Spades', 3], ['Clubs', 2], ['Clubs', 3], ['Spades', 10], ['Hearts', 6]]
 for cardh in hand:
-    deck.remove(cardh)"""
+    deck.remove(cardh)
 
 
 # Sorting hand based on suites and card size
@@ -176,7 +176,7 @@ def configure(hand_given, set_new_variables):
         if not added:
             not_in_combination_local.append(current_card)
 
-    new_hand = [in_combination_local, not_in_combination_local, chance(in_combination_local), virtual_hand]
+    new_hand = [in_combination_local, not_in_combination_local, chance(in_combination_local)]
     if set_new_variables:
         global in_combination
         in_combination = in_combination_local
@@ -185,36 +185,69 @@ def configure(hand_given, set_new_variables):
     return new_hand
 
 
-random_card = random.choice(deck)
-# random_card = ['Spades', 13]
-print(hand)
-print('')
-print('Card from deck:')
-print(random_card)
+while 1:
+    # random_card = random.choice(deck)
 
-configure(hand, True)
-print('')
-print("Combinations before card from deck:")
-print(in_combination)
+    random_card = ['Hearts', 4]
+    deck.remove(random_card)
+    print(len(deck))
+    print(hand)
+    print('')
+    print('Card from deck:')
+    print(random_card)
+    print('')
+    print('Current chance:')
+    current_chance = configure(hand, True)[2]
+    print(current_chance)
+    print('')
+    print("Combinations before card from deck:")
+    print(in_combination)
+    print(not_in_combination)
 
+    current_best = []
+    new_chance = 0
+    new_hand = []
+    left_sum = sum(s[1] for s in not_in_combination[1:])
+    dual_sum = 0
+    for v in in_combination:
+        if len(v) == 3:
+            for s in v[1:]:
+                dual_sum += s[1]
 
-current_best = []
-max_chance = 0
-for b in range(1, len(not_in_combination)):
-    card = not_in_combination[b]
-    hand_cpy = deepcopy(hand)
-    hand_cpy.insert(hand_cpy.index(card), random_card)
-    hand_cpy.remove(card)
-    if configure(hand_cpy, False)[2] > max_chance:
-        max_chance = configure(hand_cpy, False)[2]
-        current_best = configure(hand_cpy, False)
-cards_passed += 1
-in_combination = current_best[0]
-not_in_combination = current_best[1]
-hand = current_best[3]
-print('')
-print('Combinations after card from deck:')
-print(in_combination)
-print('')
-print('Chance that the next card is good:')
-print(max_chance)
+    if left_sum + dual_sum >= 10:
+        if len(not_in_combination) > 1:
+            print('Looking in Not-Combo...')
+            for b in range(1, len(not_in_combination)):
+                card = not_in_combination[b]
+                new_hand = deepcopy(hand)
+                new_hand.insert(new_hand.index(card), random_card)
+                new_hand.remove(card)
+                if configure(new_hand, False)[2] > new_chance:
+                    new_chance = configure(new_hand, False)[2]
+        else:
+            print('Looking in Combo...')
+            for b in in_combination:
+                if len(b) < 3:
+                    if b[0] == 2:
+                        new_hand = deepcopy(hand)
+                        new_hand.insert(new_hand.index(b), random_card)
+                        new_hand.remove(b)
+                        if configure(new_hand, False)[2] > new_chance:
+                            new_chance = configure(new_hand, False)[2]
+        if new_chance >= current_chance:
+            print('')
+            print('Swapped!')
+            configure(new_hand, True)
+            hand = new_hand
+            print('')
+            print('Combinations after card from deck:')
+            print(in_combination)
+            print(not_in_combination)
+            print('')
+            print('Chance that the next card is good:')
+            print(new_chance)
+
+    cards_passed += 1
+
+    print('------------------------------------------------------------')
+    input()
