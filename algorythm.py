@@ -17,17 +17,17 @@ for i in card_suites:
 
 # Random hand distributing
 i = 0
-"""while i < 10:
+while i < 10:
     candidate = random.choice(deck)
     if candidate not in hand:
         hand.append(candidate)
         deck.remove(candidate)
-        i += 1"""
+        i += 1
 
 # Concrete hand distributing (Debug)
-hand = [['Clubs', 4], ['Hearts', 3], ['Spades', 9], ['Hearts', 5], ['Hearts', 2], ['Spades', 3], ['Clubs', 2], ['Clubs', 3], ['Spades', 10], ['Hearts', 6]]
+"""hand = [['Clubs', 7], ['Spades', 12], ['Clubs', 8], ['Spades', 10], ['Clubs', 5], ['Spades', 4], ['Diamonds', 1], ['Diamonds', 12], ['Clubs', 6], ['Spades', 9]]
 for cardh in hand:
-    deck.remove(cardh)
+    deck.remove(cardh)"""
 
 
 # Sorting hand based on suites and card size
@@ -185,11 +185,10 @@ def configure(hand_given, set_new_variables):
     return new_hand
 
 
+counter = 0
 while 1:
-    # random_card = random.choice(deck)
-
-    random_card = ['Hearts', 4]
-    deck.remove(random_card)
+    random_card = random.choice(deck)
+#   random_card = ['Clubs', 12]
     print(len(deck))
     print(hand)
     print('')
@@ -199,9 +198,16 @@ while 1:
     print('Current chance:')
     current_chance = configure(hand, True)[2]
     print(current_chance)
+    current_comb_lengths = []
+    for comb_length in in_combination:
+        current_comb_lengths.append(len(comb_length) - 1)
+    print('')
+    print('Combination lengths are:')
+    print(current_comb_lengths)
     print('')
     print("Combinations before card from deck:")
-    print(in_combination)
+    for c in in_combination:
+        print(c)
     print(not_in_combination)
 
     current_best = []
@@ -209,6 +215,7 @@ while 1:
     new_hand = []
     left_sum = sum(s[1] for s in not_in_combination[1:])
     dual_sum = 0
+    new_comb_lengths = [0] * len(current_comb_lengths)
     for v in in_combination:
         if len(v) == 3:
             for s in v[1:]:
@@ -217,11 +224,17 @@ while 1:
     if left_sum + dual_sum >= 10:
         if len(not_in_combination) > 1:
             print('Looking in Not-Combo...')
-            for b in range(1, len(not_in_combination)):
-                card = not_in_combination[b]
+            for b in not_in_combination[1:]:
                 new_hand = deepcopy(hand)
-                new_hand.insert(new_hand.index(card), random_card)
-                new_hand.remove(card)
+                new_hand.insert(new_hand.index(b), random_card)
+                new_hand.remove(b)
+                current_lengths = []
+                for comb_length in configure(new_hand, False)[0]:
+                    current_lengths.append(len(comb_length) - 1)
+                for c in range(min(len(new_comb_lengths), len(current_lengths))):
+                    if current_lengths[c] > new_comb_lengths[c]:
+                        new_comb_lengths = current_lengths
+                        break
                 if configure(new_hand, False)[2] > new_chance:
                     new_chance = configure(new_hand, False)[2]
         else:
@@ -232,22 +245,48 @@ while 1:
                         new_hand = deepcopy(hand)
                         new_hand.insert(new_hand.index(b), random_card)
                         new_hand.remove(b)
+                        current_lengths = []
+                        for comb_length in configure(new_hand, False)[0]:
+                            current_lengths.append(len(comb_length) - 1)
+                        for c in range(min(len(new_comb_lengths), len(current_lengths))):
+                            if current_lengths[c] > new_comb_lengths[c]:
+                                new_comb_lengths = current_lengths
+                                break
                         if configure(new_hand, False)[2] > new_chance:
                             new_chance = configure(new_hand, False)[2]
-        if new_chance >= current_chance:
+        if new_comb_lengths > current_comb_lengths:
             print('')
-            print('Swapped!')
+            print('Swapped because of longer combination!')
             configure(new_hand, True)
             hand = new_hand
             print('')
+            print('Combination lengths are now:')
+            print(new_comb_lengths)
+            print('')
             print('Combinations after card from deck:')
-            print(in_combination)
+            for c in in_combination:
+                print(c)
             print(not_in_combination)
             print('')
             print('Chance that the next card is good:')
             print(new_chance)
-
+        elif new_comb_lengths == current_comb_lengths:
+            if new_chance > current_chance:
+                print('')
+                print('Swapped because of better chance!')
+                configure(new_hand, True)
+                hand = new_hand
+                print('')
+                print('Combinations after card from deck:')
+                print(in_combination)
+                print(not_in_combination)
+                print('')
+                print('Chance that the next card is good:')
+                print(new_chance)
+    else:
+        print('Sum is less than 10!')
     cards_passed += 1
-
+    deck.remove(random_card)
     print('------------------------------------------------------------')
+    counter += 1
     input()
