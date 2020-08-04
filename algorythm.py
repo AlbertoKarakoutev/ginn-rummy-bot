@@ -25,7 +25,7 @@ while i < 10:
         i += 1
 
 # Concrete hand distributing (Debug)
-"""hand = [['Spades', 10], ['Clubs', 6], ['Diamonds', 6], ['Spades', 11], ['Spades', 6], ['Hearts', 1], ['Clubs', 8], ['Spades', 8], ['Spades', 9], ['Clubs', 7]]
+"""hand = [['Diamonds', 10], ['Clubs', 6], ['Spades', 3], ['Spades', 12], ['Diamonds', 5], ['Hearts', 11], ['Spades', 4], ['Diamonds', 11], ['Spades', 11], ['Spades', 2]]
 for cardh in hand:
     deck.remove(cardh)"""
 
@@ -205,7 +205,7 @@ def is_card_good(b, lowest_sum, new_chance):
 counter = 0
 while 1:
     random_card = random.choice(deck)
-    # random_card = ['Hearts', 6]
+    # random_card = ['Hearts', 12]
     print('Card from deck:')
     print(random_card)
     print('')
@@ -235,19 +235,20 @@ while 1:
         if len(not_in_combination) > 1:
             print('Looking in Not-Combo...')
             for b in not_in_combination[1:]:
-                new_hand = deepcopy(hand)
-                new_hand.insert(new_hand.index(b), random_card)
-                new_hand.remove(b)
-                left_sum_new = sum(s[1] for s in configure(new_hand)[1][1:])
+                new_hand_test = deepcopy(hand)
+                new_hand_test.insert(new_hand_test.index(b), random_card)
+                new_hand_test.remove(b)
+                left_sum_new = sum(s[1] for s in configure(new_hand_test)[1][1:])
                 dual_sum_new = 0
-                for v in configure(new_hand)[0]:
+                for v in configure(new_hand_test)[0]:
                     if len(v) == 3:
                         for s in v[1:]:
                             dual_sum_new += s[1]
                 if left_sum_new + dual_sum_new < lowest_sum:
                     lowest_sum = left_sum_new + dual_sum_new
-                if configure(new_hand)[2] > new_chance:
-                    new_chance = configure(new_hand)[2]
+                    new_hand = new_hand_test
+                if configure(new_hand_test)[2] > new_chance:
+                    new_chance = configure(new_hand_test)[2]
         else:
             print('Looking in Combo...')
             two_sized = len([x for x in in_combination if len(x) == 3])
@@ -255,38 +256,41 @@ while 1:
                 if two_sized > 1:
                     if len(b) < 4:
                         for cardc in b[1:]:
-                            new_hand = deepcopy(hand)
-                            new_hand.insert(new_hand.index(cardc), random_card)
-                            new_hand.remove(cardc)
-                            left_sum_new = sum(s[1] for s in configure(new_hand)[1][1:])
+                            new_hand_test = deepcopy(hand)
+                            new_hand_test.insert(new_hand_test.index(cardc), random_card)
+                            new_hand_test.remove(cardc)
+                            left_sum_new = sum(s[1] for s in configure(new_hand_test)[1][1:])
                             dual_sum_new = 0
-                            for v in configure(new_hand)[0]:
+                            for v in configure(new_hand_test)[0]:
                                 if len(v) == 3:
                                     for s in v[1:]:
                                         dual_sum_new += s[1]
                             if left_sum_new + dual_sum_new < lowest_sum:
                                 lowest_sum = left_sum_new + dual_sum_new
-                            if configure(new_hand)[2] > new_chance:
-                                new_chance = configure(new_hand)[2]
+                                new_hand = new_hand_test
+                            if configure(new_hand_test)[2] > new_chance:
+                                new_chance = configure(new_hand_test)[2]
                 elif two_sized == 1:
                     if len(b) > 4:
                         max_card = max(b[1:], key=lambda x: x[1])
                         min_card = min(b[1:], key=lambda x: x[1])
                         for cardc in b[1:]:
                             if cardc == max_card or cardc == min_card:
-                                new_hand = deepcopy(hand)
-                                new_hand.insert(new_hand.index(cardc), random_card)
-                                new_hand.remove(cardc)
-                                left_sum_new = sum(s[1] for s in configure(new_hand)[1][1:])
+                                new_hand_test = deepcopy(hand)
+                                new_hand_test.insert(new_hand_test.index(cardc), random_card)
+                                new_hand_test.remove(cardc)
+                                left_sum_new = sum(s[1] for s in configure(new_hand_test)[1][1:])
                                 dual_sum_new = 0
-                                for v in configure(new_hand)[0]:
+                                for v in configure(new_hand_test)[0]:
                                     if len(v) == 3:
                                         for s in v[1:]:
                                             dual_sum_new += s[1]
                                 if left_sum_new + dual_sum_new < lowest_sum:
                                     lowest_sum = left_sum_new + dual_sum_new
-                                if configure(new_hand)[2] > new_chance:
-                                    new_chance = configure(new_hand)[2]
+                                    new_hand = new_hand_test
+                                if configure(new_hand_test)[2] > new_chance:
+                                    new_chance = configure(new_hand_test)[2]
+        print('')
         if lowest_sum < left_sum + dual_sum:
             print('')
             print('Swapped because of lower sum!')
